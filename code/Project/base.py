@@ -4,6 +4,7 @@ import numpy as np
 from agents.utils import * 
 from tqdm import tqdm
 import gymnasium as gym
+
 # A base class for the running/training objects for the agents
 class BaseRunner():
     def  __init__(
@@ -11,44 +12,51 @@ class BaseRunner():
            env,
            ):
         self._env = env
-        self._agents = []
-        self._num_agents = 1
+        self._agent = None
+        # self._agents = []
+        # self._num_agents = 1 # I use this for single agent. In multi agent this would depend on the environment
         self._best_ep_rew = float('-inf')
         self._best_avg_rew = float('-inf')
 
     # Train the agent with the specified number of episodes and maximum steps per episode
     def train(self, num_eps, num_steps=1000, render=False, render_step=10):
-        self.collect_validation_data()
-        ep_rewards = []
+
+
+        self.collect_validation_data()   #Function for collecting data
+
+        ep_rewards = [] #Collecting all episode rewards
+        
         info = []
         t = tqdm(range(num_eps), desc='Episodic reward: ', position=0, leave=True)
         for i in t:
             #if i%10 == 0:
             #    self.collect_validation_data(1)
+            print("training episode???????????????????????????????")
             ep_rew, tmp_info = self.train_ep(num_steps, (render and (i%render_step)==0))
+            print("training episode?Done")
             ep_rewards.append(ep_rew)
             avg = np.average(ep_rewards[-10:]) #only last 10 rewards
             info.extend(tmp_info)
             t.set_description("Episodic reward: {} | Avg reward: {} ".format(ep_rew, avg), refresh=True)
 
-
             if ep_rew > self._best_ep_rew:
                 self._best_ep_rew = ep_rew
                 print('Best rew: {}'.format(ep_rew))
-                for j in range(len(self._agents)):
-                    self._agents[j].set_best()
+                # for j in range(len(self._agents)):
+                    # self._agents[j].set_best()
+                self._agent.set_best()
 
             if (avg > self._best_avg_rew) and i>=9:
                 self._best_avg_rew = np.squeeze(avg)
                 print('Best avg rew: {}'.format(avg))
-                for j in range(len(self._agents)):
-                    self._agents[j].set_best_avg()
+                # for j in range(len(self._agents)):
+                #     self._agents[j].set_best_avg()
+                self._agent.set_best_avg()
 
         return ep_rewards, info
 
     # Runs a single training episode
     def train_ep(self, num_steps, render):
-        # Agents interaction with the environment and each other is dependent
         raise NotImplementedError
 
     def collect_validation_data(self, num_eps=50):
@@ -72,21 +80,32 @@ class BaseRunner():
     def eval_ep(self, num_steps, render, render_mode):
         raise NotImplementedError
 
-    # Save all of the agents neural nets
-    def save_agents(self, save_dir, save_type='best'):
-        for i, agent in enumerate(self._agents):
-            agent.save_models(save_dir + save_type + '/' + "agent" + str(i), save_type)
+    # Save all of the agents neural nets; For our case it's just one agent
+    # def save_agents(self, save_dir, save_type='best'):
+    #     for i, agent in enumerate(self._agents):
+    #         agent.save_models(save_dir + save_type + '/' + "agent" + str(i), save_type)
+    def save_agent(self, save_dir, save_type='best'):
+        self._agent.save_models(save_dir + save_type + '/' + "agent", save_type)
 
-    # Load the given agents neural nets
-    def load_agents(self, save_dir):
-        for i, agent in enumerate(self._agents):
-            agent.load_models(save_dir + "agent" + str(i))
+    # # Load the given agents neural nets
+    # def load_agents(self, save_dir):
+    #     for i, agent in enumerate(self._agents):
+    #         agent.load_models(save_dir + "agent" + str(i))
+
+    # Load the given agent neural nets
+    def load_agent(self, save_dir):
+        self._agent.load_models(save_dir + "agent")
+
+    # def dump_agent_attrs(self, save_dir):
+    #     for i, agent in enumerate(self._agents):
+    #         attr = self._agents[i].__dict__
+    #         with open(save_dir + 'agent' + str(i) + '.txt', 'w') as f:
+    #             f.write(str(attr))
 
     def dump_agent_attrs(self, save_dir):
-        for i, agent in enumerate(self._agents):
-            attr = self._agents[i].__dict__
-            with open(save_dir + 'agent' + str(i) + '.txt', 'w') as f:
-                f.write(str(attr))
+        attr = self._agent.__dict__
+        with open(save_dir + 'agent' + '.txt', 'w') as f:
+            f.write(str(attr))
 
 
 # A base class for individual learning agents

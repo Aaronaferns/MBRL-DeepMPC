@@ -1,6 +1,5 @@
 from agents.dynamics.dynamics_model import *
 import numpy as np
-from base import *
 from agents.nets.value_network import *
 import datetime
 import time
@@ -10,32 +9,78 @@ from agents.utils import *
 from torch.optim import Adam
 import torch as th
 import torch.nn as nn
+import gymnasium as gym
 
+
+class BaseAgent(object):
+    def __init__(
+            self,
+            env
+            ):
+        self._nS = env.observation_space.shape[0]
+        self._obs_space = env.observation_space
+        self._act_space = env.action_space
+
+
+        if isinstance(env.action_space, gym.spaces.Box):
+            print("Action space is Continuous")
+            # For continuous action spaces (Box)
+            self._nA = env.action_space.shape[0]  # For Box action spaces, this gives the number of dimensions
+            self._max = env.action_space.high[0]  # Max value of the action space
+            self._min = env.action_space.low[0]   # Min value of the action space
+        elif isinstance(env.action_space, gym.spaces.Discrete):
+            print("Action space is Discrete")
+            # For discrete action spaces
+            self._nA = env.action_space.n  # Number of discrete actions
+            self._max = env.action_space.n - 1  # Max action index (0 to n-1)
+            self._min = 0  # Min action index (always 0 for Discrete spaces)
+
+
+    def sample_action(self, state):
+        raise NotImplementedError
+
+    def noiseless_sample_action(self, state):
+        raise NotImplementedError
+
+    def train_step(self, state, action, reward, next_state, done):
+        raise NotImplementedError
+
+    def save_models(self, save_dir, save_type):
+        raise NotImplementedError
+
+    def load_models(self, save_dir):
+        raise NotImplementedError
+
+    def set_best(self):
+        raise NotImplementedError
+
+    def set_best_avg(self):
+        raise NotImplementedError
 
 class DVPMCAgent(BaseAgent):
     def __init__(
             self,
             env,
-            num_agents,
+            # num_agents,
             model=fwDiffNNModel, #dynamics model
-            value_model=DeepValueNetwork, #Value network model
+            value_model=ValueNetwork, #Value network model
             sample_policy=None,
             m_buffer_size=10000, #Memory buffer size for the dynamics model
             v_buffer_size=400000, #Replay buffer size
-            min_fit_data=500,
-            steps_p_fit=500,
+            min_fit_data=500, #Used in train step
+            steps_p_fit=500,  #Used in train step
             train_on_done=True, # Ignore the steps and train after every episode
-            epochs_p_fit=5,
+            epochs_p_fit=2,   #Used in train step
             gamma=0.99,
             alpha=7e-5,
             val_grad_clip=3.0,
-            decay=False,# 0.99, # Decay rate per episode
+            decay= None,# 0.99, # Decay rate per episode
             batch_size=512,
             rollout_length=10,
             replan_period=1,
             shots_p_step=150,
-            model_arch=[32,32,32,32],
-            model_lr=5e-5,
+            model_arch=[32,32],
+            model_lr=2e-4,
             init_data=None,
             action_sampler=CEM,
             ):
@@ -45,7 +90,7 @@ class DVPMCAgent(BaseAgent):
         self._best_model = model(self._nS, self._nA, data_size=m_buffer_size, hidden_units=model_arch, lr=model_lr)
         self._best_avg_model = model(self._nS, self._nA, data_size=m_buffer_size, hidden_units=model_arch, lr=model_lr)
 
-        self._action_sampler = action_sampler(self._nA, rollout_length, shots_p_step, self._min, self._max, self.evaluate_action_traj)
+        self._action_sampler = action_sampler(self._nA, rollout_length, shots_p_step, self._min, self._max, self.evaluate_action_traj) # CEM Sampler
         current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
 
         #self.sts_done_fn = env.sts_done_fn
@@ -64,7 +109,7 @@ class DVPMCAgent(BaseAgent):
         self._buffer = ReplayBuffer(self._nS, self._nA, buffer_capacity=v_buffer_size)
         self._batch_size = batch_size
 
-        self._min_fit_data = min_fit_data
+        self._min_fit_data = min_fit_data 
         self._steps_p_fit=steps_p_fit
         self._train_on_done = train_on_done
         self._epochs_p_fit = epochs_p_fit
@@ -91,8 +136,7 @@ class DVPMCAgent(BaseAgent):
     def sample_action(self, state):
         # TODO: Test value
         if not self._trained:
-            return self._random_act_sample(1)[0,:]
-
+            return self._random_act_sample(1)[0,:] # 1 for 1 sample
         state = th.tensor(state).squeeze()
         if len(self._acts) == 0 or self._step_count >= self._replan_period:
             self._acts = self._action_sampler.get_sol(state)
@@ -177,17 +221,22 @@ class DVPMCAgent(BaseAgent):
 
     def _random_act_sample(self, num_samples):
         acts = np.random.uniform(self._min, self._max, size=(num_samples, self._nA))
+        # print(self._nA, self._min,self._max)
+        # print("random act: ",acts)
         return acts
 
 
     def _update_val(
-        self, state_batch, reward_batch, next_state_batch, not_done_batch, step):  
+        self, state_batch, reward_batch, next_state_batch, not_done_batch, step): 
+
+        state_batch = state_batch.to(self.device) 
         reward_batch = reward_batch.to(self.device)
         next_state_batch = next_state_batch.to(self.device)
         not_done_batch = not_done_batch.to(self.device)   
+
         with th.no_grad():
-            y = reward_batch + self._gamma * self._value_model(next_state_batch.to(self.device)) * not_done_batch
-        state_batch = state_batch.to(self.device)
+            y = reward_batch + self._gamma * self._value_model(next_state_batch) * not_done_batch
+        
         est_val = self._value_model(state_batch)
         val_loss = self.loss_fn(y ,est_val)
 
@@ -206,9 +255,12 @@ class DVPMCAgent(BaseAgent):
         return val_loss, val_grad
 
     def train_step(self, state, action, reward, next_state, done):
-        self._model.push_data(np.squeeze(state), action, np.squeeze(next_state))
+        # print("Test ", state, action, reward, next_state)
+        self._model.push_data(np.squeeze(state), action, np.squeeze(next_state)) #push data to the Dynamics model's data buffer
+
         state = th.tensor(state)
         next_state = th.tensor(next_state)
+
         self._train_step_count += 1
         hist = None
         if self._train_on_done:
@@ -224,17 +276,18 @@ class DVPMCAgent(BaseAgent):
             self._train_step_count = 0
             hist = self._model.train(num_epochs=self._epochs_p_fit)
 
+        #decay learning rate
         if done and self._decay:
-            self._val_opt.learning_rate = self._decay*self._val_opt.learning_rate
+            for param_group in self._val_opt.param_groups:
+                param_group['lr']=param_group['lr']*self._decay
 
         # action = action[0]
-        state = state.squeeze().float()
-        # Generate the internal reward for the lower level network
-        next_state = next_state.squeeze().float()
+        state = state.squeeze().clone().detach().float()
+        next_state = next_state.squeeze().clone().detach().float()
+
         reward = reward
         # done = self.sts_done_fn(state.unsqueeze(0), action.unsqueeze(0), next_state.unsqueeze(0))
-        self._buffer.add((state, action, reward, next_state, done))
-        done = done
+        self._buffer.add((state, action, reward, next_state, done   ))
         #1.0 if (abs(next_state[0]) > 2.4 or abs(next_state[2]) > 2*np.pi * 12/360) else 0.0
         if done:
             s = next_state
@@ -243,8 +296,9 @@ class DVPMCAgent(BaseAgent):
             r = reward
             self._buffer.add((s, a, r, ns, done))
             
-        state_batch, _, rew_batch, nstate_batch, done_batch = self._buffer.sample_batch(self._batch_size)
-        db = th.where(done_batch == 0.0, th.tensor(1.0), th.tensor(0.0))
+        state_batch, _, rew_batch, nstate_batch, done_batch = self._buffer.sample_batch(self._batch_size) #returns all tensors
+        db =(done_batch == 0.0).float()
+
 
         val_loss, grad = self._update_val(state_batch, rew_batch, nstate_batch, db, self._train_step_count)
 
@@ -257,9 +311,12 @@ class DVPMCAgent(BaseAgent):
         return trained
 
     def push_val_data(self, curr_state, act, next_state, rew=None):
-        # act = act[0]
-        state = th.tensor(curr_state).squeeze().float()
-        next_state = th.tensor(next_state).squeeze().float()
+        # act = act[0] 
+        state = curr_state
+        state = np.squeeze(state)
+        next_state = next_state
+        next_state = np.squeeze(next_state)
+        # print(next_state.shape)
         self._model.push_val_data(curr_state, act, next_state, rew)
 
     def set_best(self):

@@ -1,0 +1,31 @@
+{'_nS': 4, '_obs_space': Box(-inf, inf, (4,), float64), '_act_space': Box(-3.0, 3.0, (1,), float32), '_nA': 1, '_max': np.float32(3.0), '_min': np.float32(-3.0), '_model': <agents.dynamics.dfnn.fwDiffNNModel object at 0x7bb93e5b2b80>, '_best_model': <agents.dynamics.dfnn.fwDiffNNModel object at 0x7bb93e5b2f70>, '_best_avg_model': <agents.dynamics.dfnn.fwDiffNNModel object at 0x7bb99902aa30>, '_action_sampler': <agents.opt.cem.CEM object at 0x7bb99902aaf0>, 'device': 'cuda:3', '_gamma': 0.99, '_val_lr': 7e-05, '_val_grad_norm': 3.0, '_decay': 0.99, '_value_model': DeepValueNetwork(
+  (fc1): Linear(in_features=4, out_features=128, bias=True)
+  (fc2): Linear(in_features=128, out_features=128, bias=True)
+  (fc3): Linear(in_features=128, out_features=64, bias=True)
+  (fc4): Linear(in_features=64, out_features=64, bias=True)
+  (out): Linear(in_features=64, out_features=1, bias=True)
+), '_val_opt': Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    lr: 7e-05
+    maximize: False
+    weight_decay: 0
+), '_best_value_model': DeepValueNetwork(
+  (fc1): Linear(in_features=4, out_features=128, bias=True)
+  (fc2): Linear(in_features=128, out_features=128, bias=True)
+  (fc3): Linear(in_features=128, out_features=64, bias=True)
+  (fc4): Linear(in_features=64, out_features=64, bias=True)
+  (out): Linear(in_features=64, out_features=1, bias=True)
+), '_best_avg_value_model': DeepValueNetwork(
+  (fc1): Linear(in_features=4, out_features=128, bias=True)
+  (fc2): Linear(in_features=128, out_features=128, bias=True)
+  (fc3): Linear(in_features=128, out_features=64, bias=True)
+  (fc4): Linear(in_features=64, out_features=64, bias=True)
+  (out): Linear(in_features=64, out_features=1, bias=True)
+), '_buffer': <agents.utils.ReplayBuffer object at 0x7bb99902aca0>, '_batch_size': 512, '_min_fit_data': 500, '_steps_p_fit': 500, '_train_on_done': True, '_epochs_p_fit': 5, '_rollout_len': 10, '_replan_period': 1, '_step_count': 0, '_shots_p_step': 150, 'loss_fn': MSELoss(), '_acts': [], '_pred_traj': [], '_train_step_count': 2971, '_trained': False, '_trained_since_check': False, 'succ': 0, 'fails': 0}

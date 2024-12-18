@@ -1,7 +1,7 @@
 from agents.dynamics.model_utils import *
 import torch as th
 
-class DynamicsModel():
+class DynamicsModel:
     def __init__(self,
                  nS,
                  nA,
@@ -71,9 +71,6 @@ class DynamicsModel():
             output = s_
             val_output = val_s_
             
-
-        
-        
         input = np.concatenate([s,a], axis=1)
         val_input = np.concatenate([val_s,val_a],axis=1)
         

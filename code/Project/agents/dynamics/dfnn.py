@@ -51,7 +51,7 @@ class fwDiffNNModel(DynamicsModel):
             action_size,
             model_rw=False,
             data_size=50000,
-            hidden_units=[32,32,32,32],
+            hidden_units=[32,32],
             lr=5e-5,
             ):
 
@@ -78,17 +78,18 @@ class fwDiffNNModel(DynamicsModel):
         hist = {"tloss":[], "vloss":[]}
 
         inp, out, val_inp, val_out = self.get_data(is_delta=True) #Gets batch data
-        inp = th.tensor(inp).float()
-        out = th.tensor(out).float()
-        val_inp = th.tensor(val_inp).float()
-        val_out = th.tensor(val_out).float()
+        inp = inp.clone().detach().to(th.float32)
+        out = out.clone().detach().to(th.float32)
+        val_inp = val_inp.clone().detach().to(th.float32)
+
+        val_out = val_out.clone().detach().to(th.float32)
 
         train_dataset = th.utils.data.TensorDataset(inp, out)#creates a pytorch dataset
         val_dataset = th.utils.data.TensorDataset(val_inp, val_out)#creates a pytorch dataset
 
         print("train_dataset",len(train_dataset))
 
-        train_loader = th.utils.data.DataLoader(train_dataset, batch_size=32 )#creates a pytorch data loader
+        train_loader = th.utils.data.DataLoader(train_dataset, batch_size=32,shuffle=True )#creates a pytorch data loader
         val_loader = th.utils.data.DataLoader(val_dataset, batch_size=32)#creates a pytorch data loader
         
         early_stopping = EarlyStopping(patience=100, verbose=True) #Creates an instance of the Early stopping class
@@ -134,11 +135,12 @@ class fwDiffNNModel(DynamicsModel):
         
 
     def predict(self, data, num_samples=1):
-        data = th.tensor(data).float().to(self.device)
+        data = th.tensor(data,dtype=th.float32).to(self.device)
         self.model.eval()
         with th.no_grad():
             pred = self.model(data)
             next_state = self.get_new_states(data, pred)
+           
             return next_state.unsqueeze(0).to('cpu')
 
     def save_model(self, save_dir):
