@@ -96,7 +96,8 @@ class DVPMCRunner:
     # Train the agent with the specified number of episodes and maximum steps per episode
     def train(self, num_eps, num_steps=1000, render=False, render_step=10):
 
-
+        ep_rew_max=1000
+        ep_rew_max_count = 0
         self.collect_validation_data()  
         #Function for collecting data, if the model is untrained, 
         #actions are random sampled from a random distribution,
@@ -130,6 +131,9 @@ class DVPMCRunner:
                 # for j in range(len(self._agents)):
                 #     self._agents[j].set_best_avg()
                 self._agent.set_best_avg()
+            if avg>900:
+                ep_avg_count+=1
+                if ep_rew_max_count==8: break
 
         return ep_rewards, info
 

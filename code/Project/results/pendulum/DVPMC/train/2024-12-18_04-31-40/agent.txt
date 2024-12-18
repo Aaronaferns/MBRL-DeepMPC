@@ -1,0 +1,33 @@
+{'_nS': 4, '_obs_space': Box(-inf, inf, (4,), float64), '_act_space': Box(-3.0, 3.0, (1,), float32), '_nA': 1, '_max': np.float32(3.0), '_min': np.float32(-3.0), '_model': <agents.dynamics.dfnn.fwDiffNNModel object at 0x70dcfed2eb20>, '_best_model': <agents.dynamics.dfnn.fwDiffNNModel object at 0x70dcfed2eeb0>, '_best_avg_model': <agents.dynamics.dfnn.fwDiffNNModel object at 0x70dd40fdb2b0>, '_action_sampler': <agents.opt.cem.CEM object at 0x70dd3ebd5be0>, 'device': 'cuda:3', '_gamma': 0.99, '_val_lr': 7e-05, '_val_grad_norm': 3.0, '_decay': None, '_value_model': ValueNetwork(
+  (fc1): Linear(in_features=4, out_features=32, bias=True)
+  (fc2): Linear(in_features=32, out_features=32, bias=True)
+  (out): Linear(in_features=32, out_features=1, bias=True)
+), '_val_opt': Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    lr: 7e-05
+    maximize: False
+    weight_decay: 0
+), '_best_value_model': ValueNetwork(
+  (fc1): Linear(in_features=4, out_features=32, bias=True)
+  (fc2): Linear(in_features=32, out_features=32, bias=True)
+  (out): Linear(in_features=32, out_features=1, bias=True)
+), '_best_avg_value_model': ValueNetwork(
+  (fc1): Linear(in_features=4, out_features=32, bias=True)
+  (fc2): Linear(in_features=32, out_features=32, bias=True)
+  (out): Linear(in_features=32, out_features=1, bias=True)
+), '_buffer': <agents.utils.ReplayBuffer object at 0x70dd40e2dd00>, '_batch_size': 512, '_min_fit_data': 500, '_steps_p_fit': 500, '_train_on_done': True, '_epochs_p_fit': 2, '_rollout_len': 10, '_replan_period': 1, '_step_count': 1, '_shots_p_step': 150, 'loss_fn': MSELoss(), '_acts': array([[0.10550361],
+       [0.56097389],
+       [1.06023068],
+       [0.98805368],
+       [0.18283367],
+       [1.07407481],
+       [0.83142208],
+       [0.15109818],
+       [0.08712777]]), '_pred_traj': [], '_train_step_count': 329, '_trained': True, '_trained_since_check': False, 'succ': 0, 'fails': 0}

@@ -10,15 +10,19 @@ class ValueNetwork(nn.Module):
         self.fc1 = nn.Linear(num_states, 32)
         self.fc2 = nn.Linear(32, 32)
         self.out = nn.Linear(32, 1)
+        self.dropout = nn.Dropout(0.1)
         # Initialize weights for the layers. Ignoring the bias of the fc layers
         nn.init.kaiming_uniform_(self.fc1.weight, nonlinearity='relu') 
         nn.init.kaiming_uniform_(self.fc2.weight, nonlinearity='relu') 
         nn.init.uniform_(self.out.weight, a=-3e-3, b=3e-3)
-        nn.init.uniform_(self.out.bias, a=-3e-3, b=3e-3)
+
+        # nn.init.uniform_(self.out.bias, a=-3e-3, b=3e-3)
 
     def forward(self, state):
         x = F.relu(self.fc1(state))
+        x = self.dropout(x)
         x = F.relu(self.fc2(x))
+        x = self.dropout(x)
         output = self.out(x)  # Output layer with linear activation
         return output
 

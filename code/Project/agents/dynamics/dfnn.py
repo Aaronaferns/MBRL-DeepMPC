@@ -72,10 +72,15 @@ class fwDiffNNModel(DynamicsModel):
         self.criterion = nn.MSELoss()  # Mean Square Error
         self.lr = lr
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        self._decay =False,# 0.99
         
 
     def train(self, num_epochs=10):
         hist = {"tloss":[], "vloss":[]}
+        # if self._decay:
+        #     for param_group in self.optimizer.param_groups:
+        #         param_group['lr']=param_group['lr']*self._decay
+
 
         inp, out, val_inp, val_out = self.get_data(is_delta=True) #Gets batch data
         inp = inp.clone().detach().to(th.float32)

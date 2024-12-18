@@ -1,0 +1,36 @@
+{'_nS': 4, '_obs_space': Box(-inf, inf, (4,), float64), '_act_space': Box(-3.0, 3.0, (1,), float32), '_nA': 1, '_max': np.float32(3.0), '_min': np.float32(-3.0), '_model': <agents.dynamics.dfnn.fwDiffNNModel object at 0x7a6ce0678b20>, '_best_model': <agents.dynamics.dfnn.fwDiffNNModel object at 0x7a6ce0678eb0>, '_best_avg_model': <agents.dynamics.dfnn.fwDiffNNModel object at 0x7a6d38f2f2b0>, '_action_sampler': <agents.opt.cem.CEM object at 0x7a6d38825be0>, 'device': 'cuda:3', '_gamma': 0.99, '_val_lr': 3e-06, '_val_grad_norm': 3.0, '_decay': 0.99, '_value_model': ValueNetwork(
+  (fc1): Linear(in_features=4, out_features=32, bias=True)
+  (fc2): Linear(in_features=32, out_features=32, bias=True)
+  (out): Linear(in_features=32, out_features=1, bias=True)
+  (dropout): Dropout(p=0.1, inplace=False)
+), '_val_opt': Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    lr: 4.05999014721096e-07
+    maximize: False
+    weight_decay: 0
+), '_best_value_model': ValueNetwork(
+  (fc1): Linear(in_features=4, out_features=32, bias=True)
+  (fc2): Linear(in_features=32, out_features=32, bias=True)
+  (out): Linear(in_features=32, out_features=1, bias=True)
+  (dropout): Dropout(p=0.1, inplace=False)
+), '_best_avg_value_model': ValueNetwork(
+  (fc1): Linear(in_features=4, out_features=32, bias=True)
+  (fc2): Linear(in_features=32, out_features=32, bias=True)
+  (out): Linear(in_features=32, out_features=1, bias=True)
+  (dropout): Dropout(p=0.1, inplace=False)
+), '_buffer': <agents.utils.ReplayBuffer object at 0x7a6d38825970>, '_batch_size': 512, '_min_fit_data': 500, '_steps_p_fit': 500, '_train_on_done': True, '_epochs_p_fit': 2, '_rollout_len': 10, '_replan_period': 1, '_step_count': 1, '_shots_p_step': 150, 'loss_fn': MSELoss(), '_acts': array([[ 0.07079804],
+       [ 0.19804069],
+       [ 0.04515473],
+       [-0.19338964],
+       [-0.04105528],
+       [-0.33701645],
+       [-0.0720662 ],
+       [ 0.25876198],
+       [ 0.00664966]]), '_pred_traj': [], '_train_step_count': 6852, '_trained': True, '_trained_since_check': False, 'succ': 0, 'fails': 0}

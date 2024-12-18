@@ -74,13 +74,13 @@ class DVPMCAgent(BaseAgent):
             gamma=0.99,
             alpha=7e-5,
             val_grad_clip=3.0,
-            decay= None,# 0.99, # Decay rate per episode
+            decay= 0.99, # Decay rate per episode
             batch_size=512,
             rollout_length=10,
             replan_period=1,
             shots_p_step=150,
             model_arch=[32,32],
-            model_lr=2e-4,
+            model_lr=5e-5,
             init_data=None,
             action_sampler=CEM,
             ):
@@ -238,6 +238,7 @@ class DVPMCAgent(BaseAgent):
             y = reward_batch + self._gamma * self._value_model(next_state_batch) * not_done_batch
         
         est_val = self._value_model(state_batch)
+        # print("Y: ",y,"  Est: ",est_val)
         val_loss = self.loss_fn(y ,est_val)
 
         self._val_opt.zero_grad()
@@ -252,7 +253,7 @@ class DVPMCAgent(BaseAgent):
 
         # Return value loss and gradients for inspection
         val_grad = [param.grad.clone() for param in self._value_model.parameters()]
-        return val_loss, val_grad
+        return val_loss.item(), val_grad
 
     def train_step(self, state, action, reward, next_state, done):
         # print("Test ", state, action, reward, next_state)

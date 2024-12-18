@@ -3,6 +3,7 @@ from arg_lists import *
 from scripts.utils import *
 from scripts.graphing import *
 import gymnasium as gym
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description='This script handles running learning \
         algorithms for various environments and agent types.')
@@ -54,6 +55,42 @@ print('Running learning for {} steps with agent {} in env {}'.format(args.eps, a
 
 rew, info = runner.train(num_eps)
 
+
+
+# Assuming you've already populated the lists with data
+# Plotting the training loss and validation loss
+plt.figure(figsize=(12, 6))
+
+# Plot Training Loss
+plt.subplot(1, 2, 1)
+plt.plot(runner._full_dyn_model_hist['tloss'], label='Training Loss', color='blue')
+plt.xlabel('steps')
+plt.ylabel('Loss')
+plt.title('Training Loss Dynamic Model')
+plt.legend()
+
+# Plot Validation Loss
+plt.subplot(1, 2, 2)
+plt.plot(runner._full_dyn_model_hist['vloss'], label='Validation Loss', color='red')
+plt.xlabel('steps')
+plt.ylabel('Loss')
+plt.title('Validation Loss Dynamic Model')
+plt.legend()
+
+plt.tight_layout()
+plt.savefig('results/plots/dynamics_model_losses.png', dpi=300)
+plt.close()
+
+
+
+plt.figure(figsize=(6, 6))
+plt.plot(runner._full_val_model_hist, label='Value Model History', color='green')
+plt.xlabel('epochs')
+plt.ylabel('Metric Value')
+plt.title('Value Model Loss')
+plt.legend()
+plt.savefig('results/plots/value_model_history.png', dpi=300)
+plt.close()
 
 save_path = ''
 if args.save_res:
