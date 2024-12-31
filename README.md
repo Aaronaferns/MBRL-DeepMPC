@@ -82,6 +82,7 @@ Ensure you have the following installed:
    ```
 3. Configure Mujoco:
    - Follow instructions at [Gymnasium Mujoco Setup](https://gymnasium.farama.org/environments/mujoco/).
+    ![Inverted Pemdulum](./Images/plots-2/inverted_pendulum.gif)
 
 4. Run instructions
    - Train 
