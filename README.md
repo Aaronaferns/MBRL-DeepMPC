@@ -36,7 +36,7 @@ The algorithm successfully demonstrated its effectiveness in dense reward enviro
 ---
 ## **Folder Structure**
 The repository is organized as follows:
-
+   ```
 root/
 ├── agent/
 │   ├── dynamics/
@@ -59,7 +59,7 @@ root/
 ├── example_env.py               # Test gym environments
 ├── train.py                     # Training script
 └── README.md                    # Project documentation
-
+   ```
 
 ## **Setup**
 
