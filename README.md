@@ -46,8 +46,8 @@ Ensure you have the following installed:
 ### **Installation**
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <repository-folder>
+   git clone https://github.com/Aaronaferns/MBRL-DeepMPC.git
+   cd MBRL-DeepMPC
    ```
 2. Install dependencies:
    ```bash
@@ -124,8 +124,7 @@ The agent achieved a stabilizing policy after ~1000 episodes in `InvertedPendulu
 2. Hafner, D., et al., *Dreamer: Learning Behaviors by Latent Imagination*. ICLR 2020.
 3. Mnih, V., et al., *Playing Atari with Deep Reinforcement Learning*. arXiv 2013.
 
-*Leave space here for additional diagrams or images.*
 
 Citations:
 [1] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/31081141/acb15678-8dd9-4c67-a21c-cb40af4869c3/DLSFinalReport.pdf
-[2] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/31081141/acb15678-8dd9-4c67-a21c-cb40af4869c3/DLSFinalReport.pdf
+
