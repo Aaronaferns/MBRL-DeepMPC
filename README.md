@@ -7,6 +7,7 @@ This repository contains the implementation of the project *"Deep Model-Based Re
 ## **Table of Contents**
 - [Abstract](#abstract)
 - [Features](#features)
+- [Folder Structure](#folder-structure)
 - [Setup](#setup)
 - [Methodology](#methodology)
 - [Environment](#environment)
@@ -33,6 +34,32 @@ The algorithm successfully demonstrated its effectiveness in dense reward enviro
 - **Gymnasium Environment**: Tested on `InvertedPendulum-v5` from Mujoco.
 
 ---
+## **Folder Structure**
+The repository is organized as follows:
+
+root/
+├── agent/
+│   ├── dynamics/
+│   │   ├── dfnn.py              # Dynamics model
+│   │   └── other_utils.py       # Helper functions for dynamics
+│   ├── mbrl/
+│   │   ├── dvmpc.py             # Agent implementation
+│   │   └── dvmpc_runner.py      # Runner class
+│   ├── nets/
+│   │   └── value_network.py     # Value function network
+│   └── opt/
+│       └── cem_optimizer.py     # Cross-Entropy Method optimizer
+├── results/
+│   ├── plots/                   # Plots for each run (rewards, losses, etc.)
+│   └── plots-saved/             # Best plots saved here
+├── scripts/
+│   └── utils.py                 # Utility functions
+├── arg_list.py                  # Argument definitions (models, envs, etc.)
+├── base.py                      # Base runner and agent classes
+├── example_env.py               # Test gym environments
+├── train.py                     # Training script
+└── README.md                    # Project documentation
+
 
 ## **Setup**
 
@@ -56,7 +83,12 @@ Ensure you have the following installed:
 3. Configure Mujoco:
    - Follow instructions at [Gymnasium Mujoco Setup](https://gymnasium.farama.org/environments/mujoco/).
 
----
+4. Run instructions
+   - Train 
+   ```bash
+   python train.py --eps=2000
+   ```
+
 
 ## **Methodology**
 
@@ -95,16 +127,19 @@ The environment involves balancing a pole upright on a moving cart by applying f
 
 ### Training Performance
 The agent achieved a stabilizing policy after ~1000 episodes in `InvertedPendulum-v5`. A maximum reward of 1000 was reached, indicating successful balancing of the pendulum.
-
-*Insert episodic reward graph here.*
+   ![Reward Plot](./Images/plots-2/rew_plot.png)
 
 ### Model Training
 1. Dynamics model training showed convergence in train/validation loss.
 2. Value model loss increased but still supported effective policy learning.
 
-*Insert train/validation loss graph here.*
+The following plots show the results of the model that converged after **1000 episodes**:
 
----
+1. **Dynamics Model Losses**  
+   ![Dynamics Model Losses](./Images/plots-2/dynamics_model_losses.png)
+
+2. **Value Model History**  
+   ![Value Model History](./Images/plots-2/value_model_history.png)
 
 ## **Challenges & Future Work**
 
@@ -121,10 +156,9 @@ The agent achieved a stabilizing policy after ~1000 episodes in `InvertedPendulu
 
 ## **References**
 1. Antonyshyn, L., Givigi, S., *Deep Model-Based Reinforcement Learning for Predictive Control of Robotic Systems with Dense and Sparse Rewards*. Journal of Intelligent Robotic Systems, 2024.
-2. Hafner, D., et al., *Dreamer: Learning Behaviors by Latent Imagination*. ICLR 2020.
-3. Mnih, V., et al., *Playing Atari with Deep Reinforcement Learning*. arXiv 2013.
 
 
-Citations:
-[1] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/31081141/acb15678-8dd9-4c67-a21c-cb40af4869c3/DLSFinalReport.pdf
+## Report
 
+For a detailed analysis and explanation of the results, refer to the full report:  
+[**Download Report**](./Report.pdf)
